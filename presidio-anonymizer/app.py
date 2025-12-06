@@ -95,6 +95,15 @@ class Server:
         def deanonymizers():
             """Return a list of supported deanonymizers."""
             return jsonify(self.deanonymize.get_deanonymizers())
+        
+        @self.app.route("/genz-preview", methods=["GET"])
+        def genz_preview():
+            response = {
+                "example": "Call Emily at 577-988-1234",
+                "example output": "Call GOAT at vibe check",
+                "description": "Example output of the genz anonymizer."
+            }
+            return jsonify(response)
 
         @self.app.errorhandler(InvalidParamError)
         def invalid_param(err):
@@ -111,6 +120,7 @@ class Server:
         def server_error(e):
             self.logger.error(f"A fatal error occurred during execution: {e}")
             return jsonify(error="Internal server error"), 500
+
 
 def create_app(): # noqa
     server = Server()
