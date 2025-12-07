@@ -6,11 +6,12 @@ from logging.config import fileConfig
 from pathlib import Path
 
 from flask import Flask, Response, jsonify, request
-from presidio_anonymizer import AnonymizerEngine, DeanonymizeEngine
-from presidio_anonymizer.operators.genz import GenZ
-from presidio_anonymizer.entities import InvalidParamError, OperatorConfig
-from presidio_anonymizer.services.app_entities_convertor import AppEntitiesConvertor
 from werkzeug.exceptions import BadRequest, HTTPException
+
+from presidio_anonymizer import AnonymizerEngine, DeanonymizeEngine
+from presidio_anonymizer.entities import InvalidParamError, OperatorConfig
+from presidio_anonymizer.operators.genz import GenZ
+from presidio_anonymizer.services.app_entities_convertor import AppEntitiesConvertor
 
 DEFAULT_PORT = "3000"
 
@@ -97,7 +98,7 @@ class Server:
         def deanonymizers():
             """Return a list of supported deanonymizers."""
             return jsonify(self.deanonymize.get_deanonymizers())
-        
+
         @self.app.route("/genz-preview", methods=["GET"])
         def genz_preview():
             response = {
@@ -106,25 +107,23 @@ class Server:
                 "description": "Example output of the genz anonymizer."
             }
             return jsonify(response)
-        
+
         @self.app.route("/genz", methods=["POST"])
         def genz():
             content = request.get_json()
             if not content:
                 raise BadRequest("Invalid request JSON")
-
             text = content.get("text", "")
             analyzer_results = AppEntitiesConvertor.analyzer_results_from_json(
                 content.get("analyzer_results", [])
             )
-
-            # Use the Gen-Z operator
             genz_result = self.anonymizer.anonymize(
                 text=text,
                 analyzer_results=analyzer_results,
-                operators={"PERSON": OperatorConfig("genz"), "PHONE_NUMBER": OperatorConfig("genz")} 
+                operators={"PERSON": OperatorConfig("genz"),
+                           "PHONE_NUMBER": OperatorConfig("genz")
+                }
             )
-
             return Response(genz_result.to_json(), mimetype="application/json")
 
         @self.app.errorhandler(InvalidParamError)
