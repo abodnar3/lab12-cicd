@@ -1,8 +1,8 @@
 """REST API server for anonymizer."""
 
 import logging
-import os
 from logging.config import fileConfig
+import os
 from pathlib import Path
 
 from flask import Flask, Response, jsonify, request
