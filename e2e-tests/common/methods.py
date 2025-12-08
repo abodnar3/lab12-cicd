@@ -19,7 +19,7 @@ def anonymize(data):
     )
     return response.status_code, response.content
 
-def anonymize_genz(data):
+def genz(data):
     response = requests.post(
         f"{ANONYMIZER_BASE_URL}/genz",
         json=data, 
